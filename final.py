@@ -20,7 +20,7 @@ QDRANT_API_KEY = st.secrets["QDRANT_API_KEY"]
 ds = pd.read_csv('data/dataarxivfinal.csv')
 print(ds.shape)
 cohere_client = cohere.Client(api_key=cohere_api_key)
-embeddings = np.load("embedding_model.npy")
+embeddings = np.load("embedding_model_comp.npz")['a']
 collection_name = "my_collection"
 distance = models.Distance.COSINE
 
