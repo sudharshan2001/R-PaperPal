@@ -7,15 +7,15 @@ from qdrant_client.http import models
 # warnings.filterwarnings('ignore')
 import qdrant_client
 import easynmt
-from config import CONFIG
+# from config import CONFIG
 
 model_translation = easynmt.EasyNMT('m2m_100_418M')# mbart50_en2m
 
 model_type = "small"
 
-cohere_api_key = CONFIG.COHERE_API_KEY
-QDRANT_URL = CONFIG.QDRANT_URL
-QDRANT_API_KEY = CONFIG.QDRANT_API_KEY
+cohere_api_key = st.secrets["COHERE_API_KEY"]
+QDRANT_URL = st.secrets["QDRANT_URL"]
+QDRANT_API_KEY = st.secrets["QDRANT_API_KEY"]
 
 ds = pd.read_csv('data/dataarxivfinal.csv')
 print(ds.shape)
