@@ -96,10 +96,12 @@ def article_summarizer():
                 summary = response.generations[0].text
                 st.write(summary)
 
+# Language Translator
 language_dict =  {"Tamil":"ta", "Nepali":"ne", "Indonesian":"id", "Thai":"th","Spanish":"es", "Russian":"ru", "Turkish":"tr", "French":"fr"}
 def article_translator():
     col1, col2 = st.columns(2)
     
+    # Select Which language to translate to
     language = st.sidebar.selectbox(
     "Select Language",
     ( "Tamil", "Nepali", "Indonesian", "Thai","Spanish", "Russian", "Turkish", "French")
@@ -124,17 +126,21 @@ def article_name():
 
     if button:
 
-        query_to_ = ds[ds['title']==title].head(1)['abstract'].values[0]
+        query_to_ = ds[ds['title']==title].head(1)['abstract'].values[0] # Extract abstract of the quried Article Title
+        
+         # Generate Embeddings for the extracted abstract
         query_vector = cohere_client.embed([query_to_], model=model_type, truncate="RIGHT").embeddings[0]
+        
         query_vector = list(map(float, query_vector))
-        search_result = client.search(collection_name=collection_name, query_vector=query_vector,limit=top_k)
+        search_result = client.search(collection_name=collection_name, query_vector=query_vector,limit=top_k) # Search K queries
+        
         similar_text_indices = [hit.id for hit in search_result]
-
         score_ =  [record.score for record in search_result]
 
         for j,i in enumerate(ds.iloc[similar_text_indices].iterrows()):
             st.write(f"**{i[1]['title']}** score:{score_[j]}")
  
+# Search article based on given prompt
 def article_content():
     search_decision  = st.button('Search')
 
