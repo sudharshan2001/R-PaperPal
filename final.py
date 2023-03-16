@@ -3,27 +3,36 @@ import cohere
 import numpy as np
 import pandas as pd
 from qdrant_client.http import models
-# import warnings
-# warnings.filterwarnings('ignore')
+import warnings
+warnings.filterwarnings('ignore')
 import qdrant_client
 import easynmt
-# from config import CONFIG
 
-model_translation = easynmt.EasyNMT('m2m_100_418M')# mbart50_en2m
+# Language Translator model
+model_translation = easynmt.EasyNMT('mbart50_en2m') # m2m_100_418M
 
-model_type = "small"
+model_type = "small"  # Embeddings model
 
+# API keys for QDRANT and COHERE
 cohere_api_key = st.secrets["COHERE_API_KEY"]
 QDRANT_URL = st.secrets["QDRANT_URL"]
 QDRANT_API_KEY = st.secrets["QDRANT_API_KEY"]
 
 ds = pd.read_csv('data/dataarxivfinal.csv')
-print(ds.shape)
-cohere_client = cohere.Client(api_key=cohere_api_key)
-embeddings = np.load("embedding_model_comp.npz")['a']
-collection_name = "my_collection"
-distance = models.Distance.COSINE
+cohere_client = cohere.Client(api_key=cohere_api_key) # Connecting to Cohere
 
+# I Saved all the generated embeddings instead of calling cohere API each time
+# embeds = cohere_client.embed(texts=list(ds['abstract']),
+#                   model="small",
+#                   truncate="RIGHT").embeddings
+# np.savez_compressed('embedding_model_comp.npz', a=embeds)
+
+embeddings = np.load("embedding_model_comp.npz")['a']  # Loading Saved Embeddings from Cohere
+
+collection_name = "my_collection" # Collection name for Qdrant
+distance = models.Distance.COSINE # Distance Metrics
+
+# Connecting to Qdrant
 client = qdrant_client.QdrantClient(
     url= QDRANT_URL,
     api_key=QDRANT_API_KEY,
@@ -34,16 +43,19 @@ button_for_upload = st.sidebar.button('Load')
 if button_for_upload:
     
     with st.spinner("Loading Models"):
+        # Create COllections
         collection_id = client.recreate_collection(collection_name = collection_name,
                                             vectors_config= models.VectorParams(size=embeddings.shape[1], distance=distance))
 
 
-        vectors=[list(map(float, vector)) for vector in embeddings]
-
+        vectors=[list(map(float, vector)) for vector in embeddings] # Mapping Float to Vectors
+            
+        # Generating IDs
         ids = []
         for i, j in enumerate(embeddings):
             ids.append(i)
-
+        
+        # Upload Vectors
         client.upload_collection(
             collection_name=collection_name, 
             ids=ids,
@@ -51,11 +63,13 @@ if button_for_upload:
             batch_size=128
             )
 
+# Select the Type
 article_rec_type = st.sidebar.selectbox(
     "Recommend article type by",
     ( "Article Name", "Article Content", "Article Translator", "Article Summarizer")
 )
 
+# Article Summarizer
 def article_summarizer():
     col1, col2 = st.columns(2)
     summarize_decision  = st.button('Summarize')
