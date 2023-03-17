@@ -1,4 +1,4 @@
-# R PaperPal is article recommendation, summarization and translation product build using Cohere and Qdrant.
+#### R PaperPal is article recommendation, summarization and translation product build using Cohere and Qdrant.
 
 
 ## Setup
