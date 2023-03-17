@@ -1,4 +1,5 @@
-# RP-Recommender
+# R PaperPal is article recommendation, summarization and translation product build using Cohere and Qdrant.
+
 
 ## Setup
 Get API keys from Cohere and Qdrant and paste it in respective fields in the program
